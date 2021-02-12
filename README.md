@@ -1,4 +1,4 @@
-# Prácticas de la asignatura Interntet y Sistemas Distribuidos (ISD) - 2020/21
+# Prácticas de la asignatura Internet y Sistemas Distribuidos (ISD) - 2020/21
 
 ## Running the project
 
