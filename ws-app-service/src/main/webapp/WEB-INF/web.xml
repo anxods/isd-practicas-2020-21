@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
+         version="2.4">
+
+    <distributable/>
+
+    <display-name>WS App Service</display-name>
+
+    <!-- REST service -->
+    <servlet>
+        <display-name>RunServlet</display-name>
+        <servlet-name>RunServlet</servlet-name>
+        <servlet-class>
+            es.udc.ws.app.restservice.servlets.RunServlet
+        </servlet-class>
+    </servlet>
+
+    <servlet>
+        <display-name>InscriptionServlet</display-name>
+        <servlet-name>InscriptionServlet</servlet-name>
+        <servlet-class>
+            es.udc.ws.app.restservice.servlets.InscriptionServlet
+        </servlet-class>
+    </servlet>
+
+    <servlet>
+        <display-name>DorsalServlet</display-name>
+        <servlet-name>DorsalServlet</servlet-name>
+        <servlet-class>
+            es.udc.ws.app.restservice.servlets.DorsalServlet
+        </servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>RunServlet</servlet-name>
+        <url-pattern>/runs/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>InscriptionServlet</servlet-name>
+        <url-pattern>/inscriptions/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>DorsalServlet</servlet-name>
+        <url-pattern>/inscriptions/dorsals/*</url-pattern>
+    </servlet-mapping>
+
+   <!-- Thrift service -->
+    <servlet>
+        <servlet-name>ThriftRunServiceServlet</servlet-name>
+        <servlet-class>es.udc.ws.app.thriftservice.ThriftRunServiceServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>ThriftRunServiceServlet</servlet-name>
+        <url-pattern>/thrift/runservice</url-pattern>
+    </servlet-mapping>
+
+    <!-- General configuration -->
+
+    <session-config>
+        <session-timeout>30</session-timeout>
+    </session-config>
+
+</web-app>

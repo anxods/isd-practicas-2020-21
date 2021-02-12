@@ -1,0 +1,149 @@
+1. addRun
+
+mvn exec:java -Dexec.mainClass="es.udc.ws.app.client.ui.RunServiceClient" -Dexec.args="-addRace 'A Coruña' '10Km. Campus Elviña' '2021-08-15T11:00' 10 2"
+mvn exec:java -Dexec.mainClass="es.udc.ws.app.client.ui.RunServiceClient" -Dexec.args="-addRace 'Santiago' '5Km. Plaza Obradoiro' '2021-08-25T11:00' 5 100"
+mvn exec:java -Dexec.mainClass="es.udc.ws.app.client.ui.RunServiceClient" -Dexec.args="-addRace 'A Coruña' '7Km. Playa Riazor' '2021-10-15T11:00' 7 200"
+mvn exec:java -Dexec.mainClass="es.udc.ws.app.client.ui.RunServiceClient" -Dexec.args="-addRace 'A Coruña' '20Km. Obelisco' '2021-10-25T11:00' 20 300"
+
+mvn exec:java -Dexec.mainClass="es.udc.ws.app.client.ui.RunServiceClient" -Dexec.args="-addRace 'A Coruña' '10Km. Torre Hércules' '2020-08-14T11:00' 10 100"
+mvn exec:java -Dexec.mainClass="es.udc.ws.app.client.ui.RunServiceClient" -Dexec.args="-addRace 'A Coruña' '10Km. Torre Hércules' '2021-08-14T11:00' -2 100"
+mvn exec:java -Dexec.mainClass="es.udc.ws.app.client.ui.RunServiceClient" -Dexec.args="-addRace 'A Coruña' '10Km. Torre Hércules' '2021-08-14T11:00' 10 0"
+mvn exec:java -Dexec.mainClass="es.udc.ws.app.client.ui.RunServiceClient" -Dexec.args="-addRace ' ' '10Km. Torre Hércules' '2021-08-14T11:00' 10 100"
+mvn exec:java -Dexec.mainClass="es.udc.ws.app.client.ui.RunServiceClient" -Dexec.args="-addRace 'A Coruña' ' ' '2021-08-14T11:00' 10 1000"
+
+
+2. Cambiar fecha en base de datos.
+En SQL ponemos la siguiente sentencia: UPDATE Run SET runStartDate='2020-11-25 10:00' WHERE runId=4;
+
+
+3. findRuns
+
+mvn exec:java -Dexec.mainClass="es.udc.ws.app.client.ui.RunServiceClient" -Dexec.args="-findRaces '2021-08-14T11:00' 'A Coruña'"
+mvn exec:java -Dexec.mainClass="es.udc.ws.app.client.ui.RunServiceClient" -Dexec.args="-findRaces '2022-08-15T11:00' 'Oleiros'"
+mvn exec:java -Dexec.mainClass="es.udc.ws.app.client.ui.RunServiceClient" -Dexec.args="-findRaces '2022-08-15T11:00' 'A Coruña'"
+mvn exec:java -Dexec.mainClass="es.udc.ws.app.client.ui.RunServiceClient" -Dexec.args="-findRaces '2022-08-15T11:00'"
+mvn exec:java -Dexec.mainClass="es.udc.ws.app.client.ui.RunServiceClient" -Dexec.args="-findRaces 'A Coruña'"
+
+4. registerInRun
+
+mvn exec:java -Dexec.mainClass="es.udc.ws.app.client.ui.RunServiceClient" -Dexec.args="-register 'user1@udc.es' 1 '0123456789111111'"
+    Inscripción #1 realizada correctamente.
+
+mvn exec:java -Dexec.mainClass="es.udc.ws.app.client.ui.RunServiceClient" -Dexec.args="-register 'user2@udc.es' 1 '0123456789222222'"
+    Inscripción #2 realizada correctamente.
+
+mvn exec:java -Dexec.mainClass="es.udc.ws.app.client.ui.RunServiceClient" -Dexec.args="-register 'user2@udc.es' 2 '0123456789222222'"
+    Inscripción #3 realizada correctamente.
+
+mvn exec:java -Dexec.mainClass="es.udc.ws.app.client.ui.RunServiceClient" -Dexec.args="-register 'user1@udc.es' 2 '0123456789111111'"
+    Inscripción #4 realizada correctamente.
+
+mvn exec:java -Dexec.mainClass="es.udc.ws.app.client.ui.RunServiceClient" -Dexec.args="-register 'user3@udc.es' 1 '0123456789333333'"
+    Haciendo un POST con Postman obtenemos el fallo esperado (ya se ha cubierto el máximo de participantes):
+
+    POST http://localhost:9090/ws-app-service/inscriptions?inscriptionUserMail=user3@udc.es&runId=1&inscriptionCreditCardNumber=0123456789333333
+
+    Body:
+    {
+        "errorType": "MaxParticipants",
+        "runId": "1"
+    }
+
+
+mvn exec:java -Dexec.mainClass="es.udc.ws.app.client.ui.RunServiceClient" -Dexec.args="-register 'user3@udc.es' 4 '0123456789333333'"
+    Haciendo un POST con Postman obtenemos el fallo esperado (si hemos hecho la sentencia SQL previa, nos dirá que la carrera ya se ha celebrado):
+
+    POST http://localhost:9090/ws-app-service/inscriptions?inscriptionUserMail=user3@udc.es&runId=4&inscriptionCreditCardNumber=0123456789333333
+
+    Body:
+    {
+        "errorType": "LateInscription",
+        "message": "Run already occurred, cannot register"
+    }
+
+mvn exec:java -Dexec.mainClass="es.udc.ws.app.client.ui.RunServiceClient" -Dexec.args="-register 'user1@udc.es' 2 '0123456789111111'"
+    Este comando del cliente permite la inscripción ya que decidimos contemplar el caso de que si un padre por ejemplo quiere inscribir a sus dos hijos menores de
+    edad, y que por lo tanto no disponen de tarjeta de crédito, será necesario permitir este caso.
+
+    Inscripción #6 realizada correctamente.
+
+mvn exec:java -Dexec.mainClass="es.udc.ws.app.client.ui.RunServiceClient" -Dexec.args="-register 'user4' 2 '0123456789444444'"
+    Haciendo un POST con Postman obtenemos el fallo esperado (el mail no es correcto):
+
+    POST http://localhost:9090/ws-app-service/inscriptions?inscriptionUserMail=user4&runId=2&inscriptionCreditCardNumber=0123456789444444
+
+    Body:
+    {
+        "errorType": "InputValidation",
+        "message": "Invalid Request: some input isn't valid, check again."
+    }
+
+mvn exec:java -Dexec.mainClass="es.udc.ws.app.client.ui.RunServiceClient" -Dexec.args="-register 'user4@udc.es' 2 '0123456789'"
+    Haciendo un POST con Postman obtenemos el fallo esperado (la tarjeta de crédito no es correcta):
+
+    POST http://localhost:9090/ws-app-service/inscriptions?inscriptionUserMail=user4@udc.es&runId=2&inscriptionCreditCardNumber=0123456789
+
+    Body:
+    {
+        "errorType": "InputValidation",
+        "message": "Invalid Request: some input isn't valid, check again."
+    }
+
+mvn exec:java -Dexec.mainClass="es.udc.ws.app.client.ui.RunServiceClient" -Dexec.args="-register 'user4@udc.es' 9 '0123456789444444'"
+    Haciendo un POST con Postman obtenemos el fallo esperado (el id de la carrera introducida no existe):
+
+    POST http://localhost:9090/ws-app-service/inscriptions?inscriptionUserMail=user4@udc.es&runId=9&inscriptionCreditCardNumber=0123456789444444
+
+    Body:
+    {
+        "errorType": "InstanceNotFound",
+        "instanceId": "9",
+        "instanceType": "Run"
+    }
+
+
+5. findInscriptions
+
+mvn exec:java -Dexec.mainClass="es.udc.ws.app.client.ui.RunServiceClient" -Dexec.args="-findRegisters 'user1@udc.es'"
+    Inscripciones 1 4 y 6, ya que como explicamos antes una misma persona podría registrarse en la misma carrera varias veces (si un padre quiere inscribir a sus 2
+    hijos menores a una carrera, este caso debería contemplarse y permitirse).
+
+mvn exec:java -Dexec.mainClass="es.udc.ws.app.client.ui.RunServiceClient" -Dexec.args="-findRegisters 'user6@udc.es'"
+    Devuelve una lista vacía.
+
+mvn exec:java -Dexec.mainClass="es.udc.ws.app.client.ui.RunServiceClient" -Dexec.args="-findRegisters 'user1'"
+    Haciendo un GET con Postman obtenemos el fallo esperado (el mail no es válido):
+
+    GET http://localhost:9090/ws-app-service/inscriptions?inscriptionUserEmail=user1
+
+    Body:
+    {
+        "errorType": "InputValidation",
+        "message": "Invalid Request: invalid mail"
+    }
+
+6. takeDorsal
+
+// Falla - Tarjeta no coincide
+mvn exec:java -Dexec.mainClass="es.udc.ws.app.client.ui.RunServiceClient" -Dexec.args="-deliverNumber 1 '0123456789222222'"
+
+// Funciona - Dorsal entregado
+mvn exec:java -Dexec.mainClass="es.udc.ws.app.client.ui.RunServiceClient" -Dexec.args="-deliverNumber 1 '0123456789111111'"
+
+// Falla - Dorsal ya entregado
+mvn exec:java -Dexec.mainClass="es.udc.ws.app.client.ui.RunServiceClient" -Dexec.args="-deliverNumber 1 '0123456789111111'"
+
+// Falla - Tarjeta inválida
+mvn exec:java -Dexec.mainClass="es.udc.ws.app.client.ui.RunServiceClient" -Dexec.args="-deliverNumber 1 '0123456789'"
+
+// Falla - Inscripción no existe
+mvn exec:java -Dexec.mainClass="es.udc.ws.app.client.ui.RunServiceClient" -Dexec.args="-deliverNumber 9 '0123456789111111'"
+
+
+7. findRun
+
+// Funciona - Plazas libres
+mvn exec:java -Dexec.mainClass="es.udc.ws.app.client.ui.RunServiceClient" -Dexec.args="-findRace 2"
+
+// Falla - No se encuentra
+mvn exec:java -Dexec.mainClass="es.udc.ws.app.client.ui.RunServiceClient" -Dexec.args="-findRace 9"
